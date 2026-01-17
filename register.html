@@ -27,11 +27,28 @@
 
       <input type="tel" name="telefon" placeholder="Numer telefonu" pattern="[0-9]{9}" required>
       <input type="email" name="email" placeholder="Adres e-mail" required>
-      <input type="password" name="password" placeholder="Hasło" required>
+      <input type="password" name="password" placeholder="Hasło" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Hasło musi zawierać co najmniej 8 znaków, w tym jedną wielką literę i jedną cyfrę." required>
 
       <button type="submit">Zarejestruj się</button>
       <p>Masz już konto? <a href="login.html">Zaloguj się</a></p>
     </form>
   </div>
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>© 2025 Linkup</p>
+
+      <nav class="footer-links">
+        <a href="informacje.html">Informacje</a>
+        <a href="pomoc.html">Pomoc</a>
+        <a href="regulamin.html">Regulamin</a>
+        <a href="o-nas.html">O nas</a>
+        <a href="prywatnosc.html">Prywatność</a>
+        <a href="bezpieczenstwo.html">Bezpieczeństwo</a>
+        <a href="kontakt.html">Kontakt</a>
+        <a href="faq.html">FAQ</a>
+        <a href="zglos-problem.html">Zgłoś problem</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>

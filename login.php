@@ -1,60 +1,44 @@
 <?php
-// WŁĄCZAMY WIDOCZNOŚĆ BŁĘDÓW (usuń te linie po zakończeniu prac nad stroną)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-session_start();
-
-// 1. KONFIGURACJA BAZY
+// 1. POŁĄCZENIE Z BAZĄ
 $host = "localhost";
 $db_user = "root";
 $db_password = "";
-$db_name = "Uzytkownicy"; // Nazwa Twojej BAZY DANYCH
+$db_name = "Uzytkownicy"; // Upewnij się, że nazwa bazy w XAMPP jest identyczna
 
 $conn = mysqli_connect($host, $db_user, $db_password, $db_name);
 
 if (!$conn) {
-    die("Błąd połączenia z bazą: " . mysqli_connect_error());
+    die("Błąd połączenia: " . mysqli_connect_error());
 }
 
-// 2. ODBIERANIE DANYCH
-if (isset($_POST['email']) && isset($_POST['password'])) {
-    
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $pass = mysqli_real_escape_string($conn, $_POST['password']); 
+// 2. LOGIKA LOGOWANIA
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Zmienione na 'password', bo tak wysyła Twój formularz (widoczne na screenie)
+    $email = isset($_POST['email']) ? $_POST['email'] : '';
+    $haslo = isset($_POST['password']) ? $_POST['password'] : ''; 
 
-    // 3. ZAPYTANIE SQL
-    // WAŻNE: Upewnij się, że nazwa tabeli (tutaj 'Uzytkownicy') jest poprawna!
-    // Często tabela nazywa się 'uzytkownicy' (małą literą), a baza 'Uzytkownicy'.
-    $sql = "SELECT * FROM Uzytkownicy WHERE email='$email' AND haslo='$pass'";
-    
-    $result = mysqli_query($conn, $sql);
+    if (!empty($email) && !empty($haslo)) {
+        // Używamy bazy do sprawdzenia użytkownika
+        $sql = "SELECT ID, imie, nazwisko FROM uzytkownicy WHERE email = ? AND haslo = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $haslo);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    // --- TUTAJ BYŁ POTENCJALNY BŁĄD 500 ---
-    // Sprawdzamy, czy zapytanie w ogóle zadziałało
-    if (!$result) {
-        // Jeśli zapytanie ma błąd (np. zła nazwa tabeli), wyświetl go:
-        die("Błąd zapytania SQL: " . mysqli_error($conn)); 
-    }
-
-    // 4. WERYFIKACJA
-    if (mysqli_num_rows($result) == 1) {
-        $_SESSION['email'] = $email;
-        $_SESSION['zalogowany'] = true;
-        
-        header("Location: main.html"); 
-        exit();
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+            
+            // SESJA - To jest klucz do automatycznych podpisów postów
+            $_SESSION['user_id'] = $user['ID']; // Zapisujemy ID z Twojej tabeli
+            $_SESSION['user_full_name'] = $user['imie'] . " " . $user['nazwisko'];
+            
+            header("Location: main.html");
+            exit();
+        } else {
+            echo "Błędny email lub hasło.";
+        }
     } else {
-        echo "<h3 style='color:red; text-align:center; margin-top:50px;'>Błędny email lub hasło!</h3>";
-        // Wyświetlamy dla pewności co wpisano (tylko do testów)
-        // echo "<p align='center'>Szukano: $email / $pass</p>"; 
-        
-        header("refresh:3;url=login.html");
+        echo "Proszę wypełnić wszystkie pola.";
     }
-} else {
-    header("Location: login.html");
 }
-
-mysqli_close($conn);
 ?>
