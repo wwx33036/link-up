@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkUp</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="icon" href="Logo.png" type="image/png">
+
+</head>
+<body>
+    <Header>
+
+        <div id="G1">
+            <img src="" alt="">
+        </div>
+        <div id="G2">
+            <img src="" alt="">
+        </div>
+        <div id="G3">
+            <img src="" alt="">
+            <a href="Contact.php"><H2>Profil</H2></a>
+        </div>
+
+    <Main>
+
+        <div id="m1"></div>
+        <div class="layout">
+        <div class="box">
+        <h3>Dodaj post</h3>
+        <form action="dodaj_post.php" method="POST">
+                <input type="text" name="tytul" placeholder="Tytuł posta" required>
+                <br><textarea name="tresc" placeholder="Co słychać, <?php echo htmlspecialchars($uzytkownik['imie']); ?>?" required></textarea>
+                <br><button type="submit">Opublikuj post</button>
+            </form>
+        </div>
+        <div id="m3">
+        <?php
+// 1. Połączenie z bazą danych
+    $conn = mysqli_connect("localhost", "root", "", "Uzytkownicy");
+
+    if (!$conn) {
+        echo "Błąd połączenia z bazą danych.";
+    } else {
+        // 2. Pobranie postów wraz z danymi autorów
+        // Używamy JOIN, aby połączyć ID autora z jego imieniem i nazwiskiem
+        $sql = "SELECT 
+                    posty.tytul, 
+                    posty.tresc, 
+                    posty.data_dodania, 
+                    uzytkownicy.imie, 
+                    uzytkownicy.nazwisko 
+                FROM posty 
+                JOIN uzytkownicy ON posty.autor_id = uzytkownicy.ID 
+                ORDER BY posty.data_dodania DESC";
+
+        $result = mysqli_query($conn, $sql);
+
+        // 3. Wyświetlanie wpisów
+        if (mysqli_num_rows($result) > 0) {
+            while($row = mysqli_fetch_assoc($result)) {
+                echo "<div class='post' style='border-bottom: 1px solid #ccc; padding: 10px;'>";
+                echo "<h3>" . htmlspecialchars($row['tytul']) . "</h3>";
+                echo "<p>" . nl2br(htmlspecialchars($row['tresc'])) . "</p>";
+                echo "<small>Autor: <b>" . $row['imie'] . " " . $row['nazwisko'] . "</b> | " . $row['data_dodania'] . "</small>";
+                echo "</div>";
+            }
+        } else {
+            echo "<p>Brak postów do wyświetlenia.</p>";
+        }
+        mysqli_close($conn);
+    }
+    ?>
+        </div>
+        
+
+    </Main>
+   <footer class="site-footer">
+    <div class="footer-container">
+      <p>© 2025 Linkup</p>
+
+      <nav class="footer-links">
+        <a href="informacje.html">Informacje</a>
+        <a href="pomoc.html">Pomoc</a>
+        <a href="regulamin.html">Regulamin</a>
+        <a href="o-nas.html">O nas</a>
+        <a href="prywatnosc.html">Prywatność</a>
+        <a href="bezpieczenstwo.html">Bezpieczeństwo</a>
+        <a href="kontakt.html">Kontakt</a>
+        <a href="faq.html">FAQ</a>
+        <a href="zglos-problem.html">Zgłoś problem</a>
+      </nav>
+    </div>
+  </footer>
+
+</body>
+</html>
