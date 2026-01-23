@@ -2,9 +2,9 @@ name: PHP Syntax Check (Lint)
 
 on:
   push:
-    branches: [ "master" ]  # Zmieniono z main na master
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]  # Zmieniono z main na master
+    branches: [ "master" ]
 
 jobs:
   build:
